@@ -1,387 +1,435 @@
 'use client';
 
-import React, { useState, ChangeEvent, FormEvent } from 'react';
 
-interface Profile {
-  name: string;
-  skills: string;
-  availability: string;
+import React, { useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
+
+
+interface UserProfile {
+  email: string;
+  username: string;
+  password: string;
 }
 
-export default function Home() {
-  const [formData, setFormData] = useState<Profile>({
-    name: '',
-    skills: '',
-    availability: ''
-  });
 
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [showProfileForm, setShowProfileForm] = useState(false);
+const content = {
+  en: {
+    nav: {
+      home: 'Home',
+      projects: 'Projects',
+      organizations: 'Organizations',
+      impact: 'Impact',
+      signUp: 'Sign Up',
+      language: 'EN/ने',
+      getStarted: 'Get Started',
+      placeholderAlert: 'Get Started clicked',
+    },
+    heading: 'Make a Lasting Impact in Nepal',
+    description:
+      'Connect your skills with Nepal’s development needs. Verified organizations. Measured results. One community for change.',
+    signUpTitle: 'Sign Up',
+    email: 'Email:',
+    username: 'Username:',
+    password: 'Password:',
+    signOut: 'Sign Out',
+  },
+  ne: {
+    nav: {
+      home: 'गृहपृष्ठ',
+      projects: 'परियोजनाहरू',
+      organizations: 'संस्थाहरू',
+      impact: 'प्रभाव',
+      signUp: 'साइन अप',
+      language: 'ने/EN',
+      getStarted: 'सुरु गर्नुहोस्',
+      placeholderAlert: 'सुरु गर्नुहोस् क्लिक गरियो',
+    },
+    heading: 'नेपालमा दीर्घकालीन प्रभाव पार्नुहोस्',
+    description:
+      'तपाईंका सीपहरूलाई नेपालको विकास आवश्यकतासँग जोड्नुहोस्। प्रमाणित संस्था। मापन गरिएका परिणामहरू। परिवर्तनको लागि एउटा समुदाय।',
+    signUpTitle: 'साइन अप',
+    email: 'इमेल:',
+    username: 'प्रयोगकर्ता नाम:',
+    password: 'पासवर्ड:',
+    signOut: 'साइन आउट',
+  },
+};
+
+
+export default function Home() {
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [showSignup, setShowSignup] = useState(false);
+  const [formData, setFormData] = useState<UserProfile>({
+    email: '',
+    username: '',
+    password: '',
+  });
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'ne'>('en');
+
 
   // Handle form input changes
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle profile form submission
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+
+  // Handle signup form submission
+  const handleSignupSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!formData.name.trim()) {
-      alert('Please enter your name');
+    if (!formData.email.trim() || !formData.username.trim() || !formData.password.trim()) {
+      alert(language === 'en' ? 'Please fill all fields' : 'कृपया सबै क्षेत्रहरू भर्नुहोस्');
       return;
     }
-    setProfiles(prev => [...prev, formData]);
-    setFormData({ name: '', skills: '', availability: '' });
-    setShowProfileForm(false); // Hide form after successful submission
+    setUser(formData);
+    setFormData({ email: '', username: '', password: '' });
+    setShowSignup(false);
   };
 
-  // Show profile form
-  const openProfileForm = () => {
-    setShowProfileForm(true);
+
+  // Toggle profile dropdown visibility
+  const toggleProfileDropdown = () => {
+    setShowProfileDropdown((prev) => !prev);
   };
 
-  // Hide profile form (return to home)
-  const backToHome = () => {
-    setShowProfileForm(false);
+
+  // Close dropdown on outside click
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowProfileDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+
+  // Sign out function
+  const handleSignOut = () => {
+    setUser(null);
+    setShowProfileDropdown(false);
   };
+
+
+  // Toggle language
+  const toggleLanguage = () => {
+    setLanguage((prev) => (prev === 'en' ? 'ne' : 'en'));
+  };
+
+
+  const langContent = content[language];
+
+
+  // Define professional color palette
+  const primaryColor = '#2C3E50';
+  const secondaryColor = '#34495E';
+  const accentColor = '#3498DB';
+  const backgroundColor = '#F7F9FA';
+  const textColor = primaryColor;
+
 
   return (
-    <div>
+    <div
+      style={{
+        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+        backgroundColor: backgroundColor,
+        color: textColor,
+        minHeight: '100vh',
+      }}
+    >
       {/* Top Bar */}
       <nav
         style={{
-          background: '#089ff8',
+          background: primaryColor,
           color: '#fff',
           padding: '1rem 2rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          position: 'relative',
         }}
       >
-        <div>
-          {/* Home button on left */}
-          {showProfileForm ? (
+        <h1 style={{ fontWeight: 'bold', fontSize: '1.5rem', margin: 0 }}>NepalCorp</h1>
+
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <a href="#" style={{ color: '#fff', textDecoration: 'none', fontWeight: 500 }}>
+            {langContent.nav.home}
+          </a>
+          <a href="#" style={{ color: '#fff', textDecoration: 'none', fontWeight: 500 }}>
+            {langContent.nav.projects}
+          </a>
+          <a href="#" style={{ color: '#fff', textDecoration: 'none', fontWeight: 500 }}>
+            {langContent.nav.organizations}
+          </a>
+          <a href="#" style={{ color: '#fff', textDecoration: 'none', fontWeight: 500 }}>
+            {langContent.nav.impact}
+          </a>
+
+
+          {!user ? (
             <button
-              onClick={backToHome}
+              onClick={() => setShowSignup(true)}
               style={{
-                backgroundColor: '#fff',
-                color: '#089ff8',
+                backgroundColor: accentColor,
+                color: '#fff',
                 border: 'none',
-                borderRadius: '3px',
-                padding: '0.3rem 0.8rem',
-                fontWeight: 'bold',
+                borderRadius: '5px',
+                padding: '0.5rem 1rem',
                 cursor: 'pointer',
-                fontSize: '1rem',
+                fontWeight: 'bold',
+                transition: 'background-color 0.3s ease',
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2980B9')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = accentColor)}
             >
-              Home
+              {langContent.nav.signUp}
             </button>
           ) : (
-            <span style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>NepalCorp</span>
+            <div style={{ position: 'relative' }} ref={dropdownRef}>
+              <button
+                onClick={toggleProfileDropdown}
+                aria-label="User Profile"
+                style={{
+                  backgroundColor: '#fff',
+                  borderRadius: '50%',
+                  width: 36,
+                  height: 36,
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: primaryColor,
+                  fontWeight: 'bold',
+                  fontSize: '1.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  userSelect: 'none',
+                }}
+                title={user.username}
+              >
+                {user.username[0].toUpperCase()}
+              </button>
+              {showProfileDropdown && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    right: 0,
+                    backgroundColor: '#fff',
+                    color: primaryColor,
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.15)',
+                    borderRadius: '6px',
+                    width: 200,
+                    zIndex: 100,
+                    padding: '1rem',
+                    fontSize: '0.9rem',
+                  }}
+                >
+                  <p><strong>{user.username}</strong></p>
+                  <p style={{ wordBreak: 'break-word' }}>{user.email}</p>
+                  <button
+                    onClick={handleSignOut}
+                    style={{
+                      marginTop: '0.5rem',
+                      backgroundColor: '#E74C3C',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '0.4rem 0.8rem',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      width: '100%',
+                      fontWeight: 'bold',
+                      transition: 'background-color 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#C0392B')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#E74C3C')}
+                  >
+                    {langContent.signOut}
+                  </button>
+                </div>
+              )}
+            </div>
           )}
-        </div>
 
-        <div>
-          {/* Right side navigation */}
-          {!showProfileForm && (
-            <button
-              onClick={openProfileForm}
-              style={{
-                backgroundColor: '#ff7300',
-                color: '#fff',
-                padding: '0.5rem 1rem',
-                borderRadius: '5px',
-                fontWeight: 'bold',
-                marginRight: '1rem',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Create Profile
-            </button>
-          )}
 
-          <a href="#" style={{ color: '#fff', margin: '0 1rem' }}>
-            Projects
-          </a>
-          <a href="#" style={{ color: '#fff', margin: '0 1rem' }}>
-            Organizations
-          </a>
-          <a href="#" style={{ color: '#fff', margin: '0 1rem' }}>
-            Impact
-          </a>
-          <a href="#" style={{ color: '#fff', margin: '0 1rem' }}>
-            About
-          </a>
-          <a href="#" style={{ color: '#fff', margin: '0 1rem' }}>
-            Contact
-          </a>
+          {/* Language toggle */}
           <button
+            onClick={toggleLanguage}
             style={{
-              marginLeft: '1rem',
               background: '#fff',
-              color: '#089ff8',
+              color: primaryColor,
               border: 'none',
               borderRadius: '3px',
               padding: '0.3rem 0.8rem',
+              cursor: 'pointer',
+              fontWeight: '600',
             }}
+            title="Toggle Language"
           >
-            EN/ने
+            {langContent.nav.language}
           </button>
         </div>
       </nav>
 
-      {/* Main content conditional */}
-      {showProfileForm ? (
-        <main
+
+      {/* Sign Up Modal */}
+      {showSignup && (
+        <div
           style={{
-            padding: '2rem',
-            fontFamily: 'Arial, sans-serif',
-            backgroundColor: '#fef7ee',
-            borderRadius: '10px',
-            margin: '2rem',
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 200,
           }}
+          onClick={() => setShowSignup(false)}
         >
-          <h2>Create Volunteer Profile</h2>
-          <form onSubmit={handleSubmit} style={{ maxWidth: 400 }}>
-            <label>
-              Name:<br />
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
-              />
-            </label>
-            <label>
-              Skills (comma separated):<br />
-              <input
-                type="text"
-                name="skills"
-                value={formData.skills}
-                onChange={handleChange}
-                placeholder="e.g. Teaching, Healthcare"
-                style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
-              />
-            </label>
-            <label>
-              Availability:<br />
-              <input
-                type="text"
-                name="availability"
-                value={formData.availability}
-                onChange={handleChange}
-                placeholder="e.g. Weekends, Full-time"
-                style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
-              />
-            </label>
-            <button
-              type="submit"
-              style={{
-                backgroundColor: '#ff7300',
-                color: 'white',
-                padding: '0.7rem 1.5rem',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-              }}
-            >
-              Save Profile
-            </button>
-          </form>
-          <h3>Saved Volunteer Profiles</h3>
-          {profiles.length === 0 ? (
-            <p>No profiles saved yet.</p>
-          ) : (
-            <ul>
-              {profiles.map((p, idx) => (
-                <li
-                  key={idx}
-                  style={{ marginBottom: '1rem', border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}
-                >
-                  <strong>Name:</strong> {p.name} <br />
-                  <strong>Skills:</strong> {p.skills || 'N/A'} <br />
-                  <strong>Availability:</strong> {p.availability || 'N/A'}
-                </li>
-              ))}
-            </ul>
-          )}
-        </main>
-      ) : (
-        <>
-          {/* Add homepage content here */}
-          <section style={{ background: '#fff3e0', padding: '3rem', textAlign: 'center' }}>
-            <h1>Make a Lasting Impact in Nepal</h1>
-            <p style={{ fontSize: '1.2rem' }}>
-              Connect your skills with Nepal’s development needs. Verified organizations. Measured results.
-              <br />
-              One community for change.
-            </p>
-            <button
-              style={{
-                background: '#ff7300',
-                color: '#fff',
-                fontWeight: 'bold',
-                border: 'none',
-                borderRadius: '5px',
-                fontSize: '1rem',
-                padding: '1rem 2rem',
-                margin: '1.5rem 0',
-              }}
-            >
-              Get Started
-            </button>
-            <br />
-            <a href="#" style={{ margin: '0 1rem', textDecoration: 'underline', color: '#3066be' }}>
-              Browse Projects
-            </a>
-            <a href="#" style={{ margin: '0 1rem', textDecoration: 'underline', color: '#3066be' }}>
-              Learn More
-            </a>
-          </section>
-
-          {/* Why NepalCorp */}
-          <section
-            style={{ display: 'flex', justifyContent: 'space-around', padding: '2rem', background: '#f1f9fd', flexWrap: 'wrap' }}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: '10px',
+              padding: '2rem',
+              width: '360px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+              position: 'relative',
+              color: primaryColor,
+            }}
           >
-            {[
-              { title: 'Impact Dashboards', desc: 'See real project results and impact metrics.' },
-              { title: 'Verified Partners', desc: 'All organizations are thoroughly vetted for trust and transparency.' },
-              { title: 'Personal Matching', desc: 'Match with projects that fit you best, based on skills and interests.' },
-              { title: 'Holistic Support', desc: 'Orientation, live support, and an emergency hotline for peace of mind.' },
-            ].map(({ title, desc }, i) => (
-              <div
-                key={i}
-                style={{ flex: '1 1 200px', margin: '1rem', padding: '1rem', background: '#fff', borderRadius: '7px', boxShadow: '0 0 8px #deebf7' }}
-              >
-                <h3>{title}</h3>
-                <p>{desc}</p>
-              </div>
-            ))}
-          </section>
-
-          {/* Featured Projects */}
-          <section style={{ padding: '2rem', background: '#fff' }}>
-            <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Featured Projects</h2>
-            <div style={{ display: 'flex', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
-              {[1, 2, 3].map((num) => (
-                <div
-                  key={num}
+            <h2 style={{ marginTop: 0 }}>{langContent.signUpTitle}</h2>
+            <form onSubmit={handleSignupSubmit}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                {langContent.email}
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                   style={{
-                    width: 300,
-                    margin: '1rem',
-                    background: '#fafafa',
-                    border: '1px solid #ff7300',
-                    borderRadius: 10,
-                    boxShadow: '0 0 10px #fceab9',
-                    padding: '1.2rem',
+                    width: '100%',
+                    padding: '0.5rem',
+                    marginTop: '0.25rem',
+                    marginBottom: '1rem',
+                    borderRadius: '4px',
+                    border: `1px solid ${primaryColor}`,
+                    fontSize: '1rem',
                   }}
-                >
-                  <h4>Project Title {num}</h4>
-                  <p>Location: Kathmandu</p>
-                  <p>
-                    <b>Urgent</b> | Skill: Education
-                  </p>
-                  <p>Work with local schools to support digital literacy.</p>
-                  <button
-                    style={{ background: '#089ff8', color: '#fff', padding: '0.5rem 1rem', border: 'none', borderRadius: '4px' }}
-                  >
-                    View Details
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Search Organizations */}
-          <section style={{ background: '#f1f9fd', padding: '2rem', textAlign: 'center' }}>
-            <h2>Find Organizations</h2>
-            <input
-              type="text"
-              placeholder="Search organizations"
-              style={{ padding: '0.8rem', width: '300px', margin: '1rem 0.5rem', border: '1px solid #ccc', borderRadius: '5px' }}
-            />
-            <button
-              style={{
-                background: '#ff7300',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                fontWeight: 'bold',
-                padding: '0.8rem 1.2rem',
-              }}
-            >
-              Search
-            </button>
-            <div style={{ marginTop: '1.5rem' }}>
-              {['Education', 'Healthcare', 'Environment', 'Kathmandu', 'Pokhara', 'Rural Nepal'].map((tag, i) => (
-                <span key={i} style={{ margin: '0 0.6rem', color: '#089ff8', textDecoration: 'underline' }}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </section>
-
-          {/* Latest Impact */}
-          <section
-            style={{ background: '#fff', padding: '2rem', borderTop: '1px solid #e6e6e6', borderBottom: '1px solid #e6e6e6', textAlign: 'center' }}
-          >
-            <h2>Latest Impact</h2>
-            <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0', gap: '3rem', flexWrap: 'wrap' }}>
-              <div>
-                <h3>1,200+</h3>
-                <p>Volunteers Matched</p>
-              </div>
-              <div>
-                <h3>320+</h3>
-                <p>Projects Completed</p>
-              </div>
-              <div>
-                <h3>40,000+</h3>
-                <p>Beneficiaries Impacted</p>
-              </div>
-            </div>
-            <h4>Volunteer Stories</h4>
-            <em>“I grew as a person and helped a Nepali school go digital.” – Recent Volunteer</em>
-          </section>
-
-          {/* How it Works */}
-          <section style={{ padding: '2rem', background: '#f1f9fd', textAlign: 'center' }}>
-            <h2>How it Works</h2>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-              <div style={{ maxWidth: 200 }}>
-                <b>1. Sign Up & Build Your Profile</b>
-              </div>
-              <div style={{ maxWidth: 200 }}>
-                <b>2. Get Matched to Projects</b>
-              </div>
-              <div style={{ maxWidth: 200 }}>
-                <b>3. Track Your Impact & Stay Supported</b>
-              </div>
-            </div>
-          </section>
-
-          {/* Safety & Support */}
-          <section style={{ background: '#fff', padding: '2rem', textAlign: 'center' }}>
-            <h2>Safety & Support</h2>
-            <ul style={{ listStyle: 'none', padding: 0 }}>
-              <li>✔ Tiered Verification Badges</li>
-              <li>✔ 24/7 Emergency Hotline</li>
-              <li>✔ Pre-Departure Toolkit</li>
-              <li>✔ Moderated Messaging Platform</li>
-            </ul>
-          </section>
-
-          {/* Footer */}
-          <footer style={{ background: '#089ff8', color: '#fff', padding: '2rem', textAlign: 'center' }}>
-            <div style={{ marginBottom: '1rem' }}>Privacy Policy | Terms | Help Desk | Contact</div>
-            <div>“Building a brighter Nepal—together.”</div>
-          </footer>
-        </>
+                />
+              </label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                {langContent.username}
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    marginTop: '0.25rem',
+                    marginBottom: '1rem',
+                    borderRadius: '4px',
+                    border: `1px solid ${primaryColor}`,
+                    fontSize: '1rem',
+                  }}
+                />
+              </label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                {langContent.password}
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    marginTop: '0.25rem',
+                    marginBottom: '1rem',
+                    borderRadius: '4px',
+                    border: `1px solid ${primaryColor}`,
+                    fontSize: '1rem',
+                  }}
+                />
+              </label>
+              <button
+                type="submit"
+                style={{
+                  backgroundColor: accentColor,
+                  color: '#fff',
+                  border: 'none',
+                  padding: '0.7rem 1.5rem',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  width: '100%',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem',
+                  transition: 'background-color 0.3s ease',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2980b9')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = accentColor)}
+              >
+                {langContent.nav.signUp}
+              </button>
+            </form>
+          </div>
+        </div>
       )}
+
+
+      {/* Main homepage content */}
+      <section
+        style={{
+          padding: '3rem 2rem 5rem',
+          maxWidth: 960,
+          margin: '0 auto',
+          color: textColor,
+        }}
+      >
+        <h1 style={{ fontWeight: '700', fontSize: '2.5rem', marginBottom: '1rem', color: primaryColor }}>
+          {langContent.heading}
+        </h1>
+        <p style={{ fontSize: '1.25rem', color: secondaryColor, maxWidth: 600, lineHeight: 1.6 }}>
+          {langContent.description}
+        </p>
+        <button
+          style={{
+            backgroundColor: accentColor,
+            color: '#fff',
+            fontWeight: '600',
+            border: 'none',
+            borderRadius: '6px',
+            fontSize: '1.15rem',
+            padding: '1rem 3rem',
+            marginTop: '2rem',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(52, 152, 219, 0.4)',
+            transition: 'background-color 0.3s ease',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2980b9')}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = accentColor)}
+          onClick={() => alert(langContent.nav.placeholderAlert)}
+        >
+          {langContent.nav.getStarted}
+        </button>
+      </section>
     </div>
   );
 }
+
+
+const primaryColor = '#2C3E50'; // Dark Blue-Gray
+const secondaryColor = '#34495E'; // Slightly lighter dark blue-gray
+const accentColor = '#3498DB'; // Bright blue for buttons and highlights
+const backgroundColor = '#F7F9FA'; // Very light gray for backgrounds
+const textColor = primaryColor;
+
+
+
