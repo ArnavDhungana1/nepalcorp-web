@@ -1,15 +1,12 @@
 'use client';
 
-
 import React, { useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
-
 
 interface UserProfile {
   email: string;
   username: string;
   password: string;
 }
-
 
 const content = {
   en: {
@@ -22,6 +19,7 @@ const content = {
       language: 'EN/ने',
       getStarted: 'Get Started',
       placeholderAlert: 'Get Started clicked',
+      signOut: 'Sign Out',
     },
     heading: 'Make a Lasting Impact in Nepal',
     description:
@@ -30,7 +28,6 @@ const content = {
     email: 'Email:',
     username: 'Username:',
     password: 'Password:',
-    signOut: 'Sign Out',
   },
   ne: {
     nav: {
@@ -42,6 +39,7 @@ const content = {
       language: 'ने/EN',
       getStarted: 'सुरु गर्नुहोस्',
       placeholderAlert: 'सुरु गर्नुहोस् क्लिक गरियो',
+      signOut: 'साइन आउट',
     },
     heading: 'नेपालमा दीर्घकालीन प्रभाव पार्नुहोस्',
     description:
@@ -50,10 +48,8 @@ const content = {
     email: 'इमेल:',
     username: 'प्रयोगकर्ता नाम:',
     password: 'पासवर्ड:',
-    signOut: 'साइन आउट',
   },
 };
-
 
 export default function Home() {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -66,13 +62,11 @@ export default function Home() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [language, setLanguage] = useState<'en' | 'ne'>('en');
 
-
   // Handle form input changes
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
 
   // Handle signup form submission
   const handleSignupSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -86,12 +80,10 @@ export default function Home() {
     setShowSignup(false);
   };
 
-
   // Toggle profile dropdown visibility
   const toggleProfileDropdown = () => {
     setShowProfileDropdown((prev) => !prev);
   };
-
 
   // Close dropdown on outside click
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -105,30 +97,25 @@ export default function Home() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-
   // Sign out function
   const handleSignOut = () => {
     setUser(null);
     setShowProfileDropdown(false);
   };
 
-
   // Toggle language
   const toggleLanguage = () => {
     setLanguage((prev) => (prev === 'en' ? 'ne' : 'en'));
   };
 
-
   const langContent = content[language];
 
-
-  // Define professional color palette
+  // Professional color palette
   const primaryColor = '#2C3E50';
   const secondaryColor = '#34495E';
   const accentColor = '#3498DB';
   const backgroundColor = '#F7F9FA';
   const textColor = primaryColor;
-
 
   return (
     <div
@@ -153,7 +140,6 @@ export default function Home() {
       >
         <h1 style={{ fontWeight: 'bold', fontSize: '1.5rem', margin: 0 }}>NepalCorp</h1>
 
-
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <a href="#" style={{ color: '#fff', textDecoration: 'none', fontWeight: 500 }}>
             {langContent.nav.home}
@@ -167,7 +153,6 @@ export default function Home() {
           <a href="#" style={{ color: '#fff', textDecoration: 'none', fontWeight: 500 }}>
             {langContent.nav.impact}
           </a>
-
 
           {!user ? (
             <button
@@ -246,13 +231,12 @@ export default function Home() {
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#C0392B')}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#E74C3C')}
                   >
-                    {langContent.signOut}
+                    {langContent.nav.signOut}
                   </button>
                 </div>
               )}
             </div>
           )}
-
 
           {/* Language toggle */}
           <button
@@ -272,7 +256,6 @@ export default function Home() {
           </button>
         </div>
       </nav>
-
 
       {/* Sign Up Modal */}
       {showSignup && (
@@ -383,7 +366,6 @@ export default function Home() {
         </div>
       )}
 
-
       {/* Main homepage content */}
       <section
         style={{
@@ -423,13 +405,3 @@ export default function Home() {
     </div>
   );
 }
-
-
-const primaryColor = '#2C3E50'; // Dark Blue-Gray
-const secondaryColor = '#34495E'; // Slightly lighter dark blue-gray
-const accentColor = '#3498DB'; // Bright blue for buttons and highlights
-const backgroundColor = '#F7F9FA'; // Very light gray for backgrounds
-const textColor = primaryColor;
-
-
-
